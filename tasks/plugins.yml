@@ -2,22 +2,22 @@
   # installing plugins for sample jenkins_job
 - name: Install plugin
   jenkins_plugin:
-     name: "{{item.key}}"
+     name: "{{ item.key }}"
      url_username: admin
      url_password: admin
      url: http://localhost:8080/
      with_dependencies: true
   when: item.value < 5
-  with_dict: "{{my_jenkins_plugins}}"
+  with_dict: "{{ my_jenkins_plugins }}"
 - name: Install plugin
   jenkins_plugin:
-   name: "{{item.key}}"
+   name: "{{ item.key }}"
    url_username: admin
    url_password: admin
    url: http://localhost:8080/
-   version: "{{item.value.version}}"
+   version: "{{ item.value.version }}"
    with_dependencies: true
   when: item.value > 5
-  with_dict: "{{my_jenkins_plugins}}"
+  with_dict: "{{ my_jenkins_plugins }}"
 
 ...
