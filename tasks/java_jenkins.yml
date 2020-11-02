@@ -2,7 +2,7 @@
 
 - name: Install Java 8 using YUM.
   yum:
-    name: "{{java.VERSION}}"
+    name: "{{ java.VERSION }}"
     state: present
   become: true
 
@@ -10,5 +10,5 @@
   alternatives:
     name: java
     link: /usr/bin/java
-    path: "{{java.ALTERNATIVES}}"
+    path: "{{ java.ALTERNATIVES }}"
 ...
