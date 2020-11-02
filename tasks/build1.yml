@@ -1,0 +1,9 @@
+---
+#adding configurationfileof jenkins job
+- jenkins_job:
+    config: "{{ lookup('file', 'templates/job1.xml') }}"
+    name: test
+    password: "{{jenkins_admin_password}}"
+    url: "{{jenkins_url}}"
+    user: "{{jenkins_admin_username}}"
+...

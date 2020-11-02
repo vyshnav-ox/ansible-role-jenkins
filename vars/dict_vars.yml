@@ -1,0 +1,10 @@
+---
+my_jenkins_plugins:
+   build-pipeline-plugin:
+   sonar:
+    version: 2.8.1
+   sonar-quality-gates:
+     version: 1.3.1
+   webhook-step:
+     version: 1.3
+   nexus-artifact-uploader:

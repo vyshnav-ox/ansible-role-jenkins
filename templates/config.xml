@@ -1,0 +1,81 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.39">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.7.2"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.7.2">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.1.1"/>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.83">
+    <script>pipeline {
+    agent any
+
+    tools {
+        // install maven 
+        maven &quot;my_maven3.6.3&quot;
+    }
+
+    stages {
+        stage(&apos;checkout&apos;) {
+            steps {
+                // Get some code from a GitHub repository
+               git &apos;https://github.com/jglick/simple-maven-project-with-tests.git&apos;
+            }
+        
+        } 
+        stage(&apos;sonar analysis&apos;){
+            steps {
+                //using sonarqube via maven
+                    withSonarQubeEnv(&apos;my_sonarqube&apos;) {
+                    sh label: &apos;&apos;, script: &apos; mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=admin -Dsonar.host.url=http://192.168.33.40:9000/ &apos;
+                    
+                }
+            
+            }
+        }
+        stage(&quot;Quality Gate&quot;) {
+            steps {
+              timeout(time: 1, unit: &apos;HOURS&apos;) {
+                waitForQualityGate abortPipeline: true
+              }
+            }
+            
+        }
+        stage(&apos;build&apos;){
+            steps {
+                //build using mvn
+                sh &quot;mvn clean install -Dmaven.test.failure.ignore=true&quot; 
+            
+            }
+        }
+
+   stage(&apos;upload artifacts&apos;){
+            steps {
+                //uploading to nexuus repo
+                nexusArtifactUploader artifacts: [[artifactId: &apos;simple-maven-project-with-tests&apos;, 
+                classifier: &apos;&apos;, 
+                file: &apos;target/simple-maven-project-with-tests-1.0-SNAPSHOT.jar&apos;, 
+                type: &apos;jar&apos;]], credentialsId: &apos;nexus&apos;, groupId: &apos;test&apos;, 
+                nexusUrl: &apos;192.168.33.40:8081/&apos;, nexusVersion: &apos;nexus3&apos;, 
+                protocol: &apos;http&apos;, 
+                repository: &apos;my_jenkins&apos;, version: &apos;1.0-SNAPSHOT&apos;
+                
+            
+            }
+        }
+    }
+}
+</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

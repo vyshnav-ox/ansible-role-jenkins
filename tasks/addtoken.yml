@@ -1,0 +1,23 @@
+---
+- name: JENKINS-CTEDENTIALS | Create CRUMB authentication request
+  uri:
+   url: 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
+   user: admin
+   password: admin
+   force_basic_auth: yes
+   return_content: yes
+  register: crumb
+- name: JENKINS-CTEDENTIALS | Add Jenkins administration account
+  uri:
+      method: POST
+      url: 'http://localhost:8080/descriptor/com.cloudbees.plugins.credentials.CredentialsSelectHelper/resolver/com.cloudbees.plugins.credentials.CredentialsSelectHelper$SystemContextResolver/provider/com.cloudbees.plugins.credentials.SystemCredentialsProvider$ProviderImpl/context/jenkins/addCredentials'
+      user: admin
+      password: admin
+      force_basic_auth: yes
+      follow_redirects: all
+      headers:
+        Jenkins-Crumb: '{{ crumb.content.split(":")[1] }}'
+        Cookie: '{{ crumb.set_cookie }}'
+      # body: 'username=user2&password1=pass&password2=pass&fullname=fullname&email=bubba%40dummy.bg'
+      body: '_.domain=_&_.scope=GLOBAL&_.username=admin&_.password=admin228&_.id=nexus2'
+...

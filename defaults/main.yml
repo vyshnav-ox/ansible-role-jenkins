@@ -1,0 +1,74 @@
+---
+# vars file for jenkins
+
+java:
+  VERSION: "java-1.8.0-openjdk-devel"
+  ALTERNATIVES: "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.262.b10-0.el7_8.x86_64/jre/bin/java"
+
+# Change this to `latest` to update Jenkins if a newer version is available.
+jenkins_package_state: latest
+jenkins_repo_url: "https://pkg.jenkins.io/redhat-stable/jenkins.repo"
+jenkins_repo_key_url: "https://pkg.jenkins.io/redhat-stable/jenkins.io.key"
+
+jenkins_prefer_lts: false
+
+jenkins_connection_delay: 5
+jenkins_connection_retries: 60
+jenkins_home: /var/lib/jenkins
+jenkins_hostname: localhost
+jenkins_http_port: 8080
+jenkins_jar_location: /opt/jenkins-cli.jar
+jenkins_url_prefix: ""
+jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
+
+jenkins_plugins_state: present
+jenkins_plugin_updates_expiration: 86400
+jenkins_plugin_timeout: 30
+jenkins_plugins_install_dependencies: true
+jenkins_updates_url: "https://updates.jenkins.io"
+
+jenkins_admin_username: admin
+jenkins_admin_password: admin
+jenkins_admin_password_file: ""
+jenkins_url: "http://192.168.33.40:80"
+jenkins_process_user: jenkins
+jenkins_process_group: "{{ jenkins_process_user }}"
+
+jenkins_init_changes:
+  - option: "JENKINS_ARGS"
+    value: "--prefix={{ jenkins_url_prefix }}"
+  - option: "{{ jenkins_java_options_env_var }}"
+    value: "{{ jenkins_java_options }}"
+#below variables are only required for build purpose
+# Plugin list can use the plugin name, or a name/version dict.
+#plugin list is given as per the my the job requirment
+#consider your requirments and update it
+my_jenkins_plugins:
+  build-pipeline-plugin:
+  sonar:
+    version: 2.8.1
+  sonar-quality-gates:
+  nexus-artifact-uploader:
+  workflow-job:
+  workflow-aggregator:
+  pipeline-stage-view:
+  git:
+  blueocean:
+# consider your job requirments and update
+global_conf:
+  maven_conf:
+    file: hudson.tasks.Maven.xml
+  qualitygate:
+    file: org.quality.gates.jenkins.plugin.GlobalConfig.xml
+  sonar:
+    file: hudson.plugins.sonar.SonarGlobalConfiguration.xml
+  org.jenkinsci.plugins.gitclient.JGitApacheTool.xml:
+    file: org.jenkinsci.plugins.gitclient.JGitApacheTool.xml
+  org.jenkinsci.plugins.gitclient.JGitTool.xml:
+    file: org.jenkinsci.plugins.gitclient.JGitTool.xml
+  hudson.plugins.git.GitTool.xml:
+    file: hudson.plugins.git.GitTool.xml
+#sonar webhook details
+webhook_name: my_jenkins
+webhook_url: "http://192.168.33.40:8080/sonarqube-webhook/"
+...

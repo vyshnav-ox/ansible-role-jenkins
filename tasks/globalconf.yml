@@ -1,0 +1,32 @@
+---
+- name: configure global env environment
+  template:
+    src: templates/{{item.key}}
+    dest: /var/lib/jenkins/{{item.value.file}}
+    owner: jenkins
+    group: jenkins
+    mode: 0755
+  with_dict: "{{global_conf}}"
+
+- name: "Create new webhook for SonarQube"
+  uri:
+   url: "http://localhost:9000/api/webhooks/create"
+   user: "admin"
+   password: "admin"
+   method: POST
+   force_basic_auth: yes
+   return_content: yes
+   body_format: form-urlencoded
+   headers:
+    Accept: application/json
+    content-type: application/x-www-form-urlencoded
+   body:
+    name: "{{webhook_name}}"
+    url: "{{webhook_url}}"
+   status_code: 200,204
+   with_items:
+       - "{{ sonar_webhook_attributes }}"
+   retries: 5
+   delay: 10
+  when: sonar_webhook_attributes is defined
+...
