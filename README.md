@@ -18,8 +18,8 @@ Dependencies
 
 To build the job installation of sonarqube and nexus is required
 available on my git hub page
-ansible-role/sonar
-ansible-role/nexus
+ansible-role-sonar
+ansible-role-nexus
 
 Example Playbook
 ----------------
